@@ -1,7 +1,8 @@
-import { Module, HttpModule, HttpService } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import { MongoClient } from 'mongodb';
+import { HttpModule, HttpService } from '@nestjs/axios'
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -10,6 +11,7 @@ import { ProductsModule } from './products/products.module';
 import { DatabaseModule } from './database/database.module';
 import { enviroments } from './enviroments';
 import config from './config';
+import { mapTo } from 'rxjs';
 
 
 const uri = 'mongodb://root:root@localhost:27017/?authSource=admin&readPreference=primary';
@@ -48,9 +50,8 @@ run();
       provide: 'TASKS',
       useFactory: async (http: HttpService) => {
         const tasks = await http
-          .get('https://jsonplaceholder.typicode.com/todos')
-          .toPromise();
-        return tasks.data;
+          .get('https://jsonplaceholder.typicode.com/todos');
+        return tasks;
       },
       inject: [HttpService],
     },
