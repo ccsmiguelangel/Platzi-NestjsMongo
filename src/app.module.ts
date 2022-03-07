@@ -11,7 +11,8 @@ import { ProductsModule } from './products/products.module';
 import { DatabaseModule } from './database/database.module';
 import { enviroments } from './enviroments';
 import config from './config';
-import { mapTo } from 'rxjs';
+import { map } from 'rxjs/operators';
+
 
 
 const uri = 'mongodb://root:root@localhost:27017/?authSource=admin&readPreference=primary';
@@ -50,7 +51,12 @@ run();
       provide: 'TASKS',
       useFactory: async (http: HttpService) => {
         const tasks = await http
-          .get('https://jsonplaceholder.typicode.com/todos');
+          .get('https://jsonplaceholder.typicode.com/todos').pipe(
+            map(params => {
+              params['id']
+              console.log(params['id'])
+            })
+          );
         return tasks;
       },
       inject: [HttpService],
