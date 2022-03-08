@@ -20,8 +20,8 @@ export class AppController {
     return 'con /sas/';
   }
 
-  @Get('/tasks/') // 👈 New endpoint
-  getTasks() {  
+  @Get('/tasks/')
+  getTasks() {
     return this.appService.getTasks();
   }
 }
