@@ -7,48 +7,53 @@ import {
   IsOptional,
   Min, 
   ValidateIf,
-  ValidateNested, // 👈 new decorator
+  ValidateNested,
+  IsMongoId, // 👈 new decorator
 } from 'class-validator';
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 
-import { CreateCategoryDto } from './category.dtos';  // 👈
+import { CreateCategoryDto } from './category.dtos';
 
 export class CreateProductDto {
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ description: `product's name` }) // 👈 use ApiProperty
+  @ApiProperty({ description: `product's name` })
   readonly name: string; 
 
   @IsString()
   @IsNotEmpty()
-  @ApiProperty() // 👈 use ApiProperty
+  @ApiProperty()
   readonly description: string;
 
   @IsNumber()
   @IsNotEmpty()
   @IsPositive()
-  @ApiProperty() // 👈 use ApiProperty
+  @ApiProperty()
   readonly price: number;
 
   @IsNumber()
   @IsNotEmpty()
-  @ApiProperty() // 👈 use ApiProperty
+  @ApiProperty()
   readonly stock: number;
 
   @IsUrl()
   @IsNotEmpty()
-  @ApiProperty() // 👈 use ApiProperty
+  @ApiProperty()
   readonly image: string;
 
   @IsNotEmpty()
   @ValidateNested()
   @ApiProperty()
-  readonly category: CreateCategoryDto; // 👈 new field
+  readonly category: CreateCategoryDto; 
+  
+  @IsNotEmpty()
+  @IsMongoId()
+  readonly brand: string; // 👈 new field
 }
 
 export class UpdateProductDto extends PartialType(CreateProductDto) {}
 
-export class FilterProductsDto { // 👈 new DTO
+export class FilterProductsDto {
   @IsOptional()
   @IsPositive()
   limit: number;
@@ -59,9 +64,9 @@ export class FilterProductsDto { // 👈 new DTO
 
   @IsOptional()
   @Min(0)
-  minPrice: number; // 👈 new field
+  minPrice: number;
 
   @ValidateIf((params) => params.minPrice)
   @IsPositive()
-  maxPrice: number;  // 👈 new field
+  maxPrice: number;
 }

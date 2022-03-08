@@ -15,21 +15,63 @@ export class ProductsService {
     @InjectModel(Product.name) private productModel: Model<Product>,
   ) {}
 
+  // findAll(params?: FilterProductsDto) {
+  //   if (params) {
+  //     const filters: FilterQuery<Product> = {};
+  //     const { limit, offset } = params;
+  //     const { minPrice, maxPrice } = params;
+  //     if (minPrice && maxPrice) {
+  //       filters.price = { $gte: minPrice, $lte: maxPrice };
+  //     }
+  //     return this.productModel
+  //       .find(filters)
+  //       .populate('brand') // 👈 relation
+  //       .skip(offset)
+  //       .limit(limit)
+  //       .exec();
+  //   }
+  //   return this.productModel.find().populate('brand').exec(); // 👈 relation
+  // }
+
   findAll(params?: FilterProductsDto) {
     if (params) {
       const filters: FilterQuery<Product> = {};
-      const { limit, offset } = params;
+      const limit = params.limit || 10;
+      const offset = params.offset || 0;
       const { minPrice, maxPrice } = params;
       if (minPrice && maxPrice) {
         filters.price = { $gte: minPrice, $lte: maxPrice };
+      } else {
+        if (minPrice) {
+          filters.price = { $gte: minPrice };
+        } else {
+          if (maxPrice) {
+            filters.price = { $lte: maxPrice };
+          }
+        }
       }
-      return this.productModel.find(filters).skip(offset).limit(limit).exec();
+      return this.productModel
+        .find(filters)
+        .populate('brand')
+        .skip(offset * limit)
+        .limit(limit)
+        .exec();
     }
-    return this.productModel.find().exec();
+    return this.productModel.find().populate('brand').exec();
   }
 
+  // async findOne(id: string) {
+  //   const product = await this.productModel.findById(id).exec();
+  //   if (!product) {
+  //     throw new NotFoundException(`Product #${id} not found`);
+  //   }
+  //   return product;
+  // }
+
   async findOne(id: string) {
-    const product = await this.productModel.findById(id).exec();
+    const product = await this.productModel
+      .findOne({ _id: id })
+      .populate('brand');
     if (!product) {
       throw new NotFoundException(`Product #${id} not found`);
     }
